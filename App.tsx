@@ -9,6 +9,7 @@ import {
   Poppins_500Medium,
   Poppins_700Bold
 } from '@expo-google-fonts/poppins';
+import { Text } from 'react-native';
 
 export default function App() {
   const [fontsLoaded] = useFonts({
