@@ -10,7 +10,8 @@ import {
   Header,
   Title,
   Content,
-  ChartContainer
+  ChartContainer,
+  MonthSelect
 } from './styles';
 import { categories } from '../../utils/categories';
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -101,6 +102,11 @@ export function Resume() {
           paddingBottom: useBottomTabBarHeight(),
         }}
       >
+        <MonthSelect>
+          <Previous>
+            <Select
+          </Previous>
+        </MonthSelect>
         <ChartContainer>
           <VictoryPie
             data={totalByCategorys}
@@ -115,7 +121,7 @@ export function Resume() {
             labelRadius={50}
             x="percent"
             y="total"
-          />
+          />  
         </ChartContainer>
         {
           totalByCategorys.map(item => (
