@@ -2,7 +2,9 @@ import React, { useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { VictoryPie } from 'victory-native';
 import { useBottomTabBarHeight } from '@react-navigation/bottom-tabs';
-import { useTheme } from 'styled-components'
+import { useTheme } from 'styled-components';
+import { addMonths, subMonths, format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 
 import { HistoryCard } from '../../Components/HistoryCard';
 import {
@@ -11,7 +13,11 @@ import {
   Title,
   Content,
   ChartContainer,
-  MonthSelect
+  MonthSelect,
+  MonthSelectButton,
+  MonthSelectIcon,
+  Month,
+
 } from './styles';
 import { categories } from '../../utils/categories';
 import { RFValue } from 'react-native-responsive-fontsize';
@@ -34,9 +40,18 @@ interface CategoryData {
 }
 
 export function Resume() {
+  const [ selectedDate, setSelectedDate ] = useState(new Date());
   const [totalByCategorys, setTotalByCategorys] = useState<CategoryData[]>([])
 
   const theme = useTheme();
+
+  function handleDateChange(action: 'next'| 'prev'){
+    if(action === 'next'){
+      setSelectedDate(addMonths(selectedDate, 1));
+    }else{
+      setSelectedDate(subMonths(selectedDate, 1));
+    }
+  }
 
   async function loadData() {
     const dataKey = "@gofinances:transactions";
@@ -44,13 +59,14 @@ export function Resume() {
     const responseFormatted = response ? JSON.parse(response) : [];
 
     const expensives = responseFormatted
-    .filter((expensive: TransactionsData) => expensive.type === "negative");
+    .filter((expensive: TransactionsData) => 
+    expensive.type === "negative" && 
+    new Date(expensive.date).getMonth() === selectedDate.getMonth() &&
+    new Date(expensive.date).getFullYear() === selectedDate.getFullYear());
 
     const expensivesTotal = expensives.reduce((acumullator: number, expensive: TransactionsData) => {
       return acumullator + Number(expensive.amount);
     },0) ;     
-
-    console.log(expensivesTotal);
 
     const totalByCategory: CategoryData[] = [];
 
@@ -88,7 +104,7 @@ export function Resume() {
 
   useEffect(() => {
     loadData();
-  }, [])
+  }, [selectedDate])
 
   return (
     <Container>
@@ -103,9 +119,15 @@ export function Resume() {
         }}
       >
         <MonthSelect>
-          <Previous>
-            <Select
-          </Previous>
+          <MonthSelectButton onPress={() => handleDateChange('prev')}>
+            <MonthSelectIcon name="chevron-left"/>
+          </MonthSelectButton>
+          <Month>
+            {format(selectedDate, "MMMM, yyyy", { locale: ptBR })}
+          </Month>
+          <MonthSelectButton onPress={() => handleDateChange('next')}>
+            <MonthSelectIcon name="chevron-right"/>
+          </MonthSelectButton>
         </MonthSelect>
         <ChartContainer>
           <VictoryPie
