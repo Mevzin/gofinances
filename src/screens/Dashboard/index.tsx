@@ -111,7 +111,6 @@ export function Dashboard() {
     const lastTransactionEntries = getLastTransactionDate(transactions, 'positive');
     const lastTransactionExpensives = getLastTransactionDate(transactions, 'negative');
    
-   console.log(lastTransactionExpensives)
     const totalInterval = lastTransactionExpensives === 'NaN de Invalid Date'
     ? 'Não há transações'
     : `01 a ${lastTransactionExpensives}`;
