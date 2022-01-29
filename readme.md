@@ -8,7 +8,7 @@
 </h4>
 
 <h1 align="center">
-  <img width="300px" alt="NextLevelWeek" title="#NextLevelWeek" src="https://i.imgur.com/LuO54rB.gif" />
+  <img width="300px" alt="GoFiances" title="GoFiances" src="https://i.imgur.com/LuO54rB.gif" />
 </h1>
 
 ### Pré-requisitos
