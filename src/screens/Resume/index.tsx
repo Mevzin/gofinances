@@ -20,11 +20,17 @@ import {
   MonthSelectButton,
   MonthSelectIcon,
   Month,
-  LoadContainer
+  LoadContainer,
+  NotResumeText,
+  ContentNotResume,
+  ImageNoData
 } from './styles';
 import { categories } from '../../utils/categories';
 import { RFValue } from 'react-native-responsive-fontsize';
 
+import SvgUri from 'react-native-svg-uri';
+
+import NoDataPng from '../../assets/no-data.png';
 interface TransactionsData {
   type: 'positive' | 'negative';
   name: string;
@@ -44,17 +50,17 @@ interface CategoryData {
 
 export function Resume() {
   const [isLoading, setIsLoading] = useState(false);
-  const [ selectedDate, setSelectedDate ] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [totalByCategorys, setTotalByCategorys] = useState<CategoryData[]>([])
 
   const { user } = useAuth();
 
   const theme = useTheme();
 
-  function handleDateChange(action: 'next'| 'prev'){
-    if(action === 'next'){
+  function handleDateChange(action: 'next' | 'prev') {
+    if (action === 'next') {
       setSelectedDate(addMonths(selectedDate, 1));
-    }else{
+    } else {
       setSelectedDate(subMonths(selectedDate, 1));
     }
   }
@@ -66,14 +72,14 @@ export function Resume() {
     const responseFormatted = response ? JSON.parse(response) : [];
 
     const expensives = responseFormatted
-    .filter((expensive: TransactionsData) => 
-    expensive.type === "negative" && 
-    new Date(expensive.date).getMonth() === selectedDate.getMonth() &&
-    new Date(expensive.date).getFullYear() === selectedDate.getFullYear());
+      .filter((expensive: TransactionsData) =>
+        expensive.type === "negative" &&
+        new Date(expensive.date).getMonth() === selectedDate.getMonth() &&
+        new Date(expensive.date).getFullYear() === selectedDate.getFullYear());
 
     const expensivesTotal = expensives.reduce((acumullator: number, expensive: TransactionsData) => {
       return acumullator + Number(expensive.amount);
-    },0) ;     
+    }, 0);
 
     const totalByCategory: CategoryData[] = [];
 
@@ -92,7 +98,7 @@ export function Resume() {
           currency: 'BRL'
         });
 
-        const percent = `${(categorySum/expensivesTotal * 100).toFixed(0)}%`;
+        const percent = `${(categorySum / expensivesTotal * 100).toFixed(0)}%`;
 
         totalByCategory.push({
           key: category.key,
@@ -115,18 +121,18 @@ export function Resume() {
 
   return (
     <Container>
-      
-        <Header>
-          <Title>Resumo por categoria</Title>
-        </Header>
-        { isLoading ? 
+
+      <Header>
+        <Title>Resumo por categoria</Title>
+      </Header>
+      {isLoading ?
         <LoadContainer>
-          <ActivityIndicator 
+          <ActivityIndicator
             color={theme.colors.primary}
             size="large"
-          /> 
-        </LoadContainer>:
-        <Content 
+          />
+        </LoadContainer> :
+        <Content
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{
             paddingHorizontal: 24,
@@ -135,31 +141,42 @@ export function Resume() {
         >
           <MonthSelect>
             <MonthSelectButton onPress={() => handleDateChange('prev')}>
-              <MonthSelectIcon name="chevron-left"/>
+              <MonthSelectIcon name="chevron-left" />
             </MonthSelectButton>
             <Month>
               {format(selectedDate, "MMMM, yyyy", { locale: ptBR })}
             </Month>
             <MonthSelectButton onPress={() => handleDateChange('next')}>
-              <MonthSelectIcon name="chevron-right"/>
+              <MonthSelectIcon name="chevron-right" />
             </MonthSelectButton>
           </MonthSelect>
-          <ChartContainer>
-            <VictoryPie
-              data={totalByCategorys}
-              colorScale={totalByCategorys.map(category => category.color)}
-              style={{
-                labels: {
-                  fontSize: RFValue(18),
-                  fontWeight: "bold",
-                  fill: theme.colors.shape
-                }
-              }}
-              labelRadius={80}
-              x="percent"
-              y="total"
-            />  
-          </ChartContainer>
+          {totalByCategorys.length > 0 ? (
+            <ChartContainer>
+              <VictoryPie
+                data={totalByCategorys}
+                colorScale={totalByCategorys.map(category => category.color)}
+                style={{
+                  labels: {
+                    fontSize: RFValue(18),
+                    fontWeight: "bold",
+                    fill: theme.colors.shape
+                  }
+                }}
+                labelRadius={80}
+                x="percent"
+                y="total"
+              />
+            </ChartContainer>
+          ) : (
+            <ContentNotResume>
+              <ImageNoData 
+              source={NoDataPng} 
+              />
+              <NotResumeText>
+                Não há dados para o més selecionado
+              </NotResumeText>
+            </ContentNotResume>
+          )}
           {
             totalByCategorys.map(item => (
               <HistoryCard
@@ -171,7 +188,6 @@ export function Resume() {
             ))
           }
         </Content>
-
       }
     </Container>
   )

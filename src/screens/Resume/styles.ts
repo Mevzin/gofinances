@@ -61,3 +61,21 @@ export const LoadContainer = styled.View`
   justify-content: center;
   align-items: center;
 `;
+
+export const ContentNotResume = styled.View`
+  padding-top: 40%;
+  justify-content: center;
+  align-items: center;
+`;
+
+export const NotResumeText = styled.Text`
+  font-family: ${({ theme }) => theme.fonts.regular};
+  font-size: ${RFValue(20)}px;
+  color: ${({ theme }) => theme.colors.text};
+  text-align: center
+`;
+
+export const ImageNoData = styled.Image`
+  width: ${RFValue(100)}px;
+  height: ${RFValue(110)}px;
+`;
